@@ -24,13 +24,14 @@ class IndexPage extends React.Component{
       {name:"Sun", distance_from_sun:0, radius:696340e3, scene_item:null},
       {name:"Mercury", distance_from_sun:57910000e3, radius:2439.7e3, scene_item:null},
       {name:"Venus", distance_from_sun:108200000e3, radius:6051.8e3, scene_item:null},
-      {name:"Earth", distance_from_sun:147280000e3, radius:6371e3, scene_item:null},
+      {name:"Earth", distance_from_sun:147280000e3, radius:6371e3, scene_item:null, moons:[{name:"Moon", T:2419200, scene_item:null}]},
       {name:"Mars", distance_from_sun:226440000e3, radius:3389.5e3, scene_item:null},
       {name:"Jupiter", distance_from_sun:746480000e3, radius:69911e3, scene_item:null},
       {name:"Saturn", distance_from_sun:1480800000e3, radius:58232e3, scene_item:null},
       {name:"Uranus", distance_from_sun:2949300000e3, radius:25362e3, scene_item:null},
       {name:"Neptune", distance_from_sun:4495000000e3, radius:24622e3, scene_item:null}
     ];
+
     this.time = + new Date();//time of the simulation
     this.scene_container = React.createRef();//create a reference to the scene container
   }
@@ -108,6 +109,7 @@ class IndexPage extends React.Component{
       let object = this.create_planet(planet.radius, planet.distance_from_sun, planet.name);//create planet
       planet.scene_item = object;//store the planet so the position can be changes later
       scene.add(object);//add the planet to the scene
+
       let width;//calculate the width of the orbital path
       switch(planet.name){
         case "Mercury":
@@ -171,8 +173,6 @@ class IndexPage extends React.Component{
     };
 
     window.addEventListener("keydown", event => {//allow for the camera to be moved with the arrow keys
-      console.log(event)
-      event.preventDefault();
       switch (event.key){
         case "ArrowLeft":
           camera.translateX(-10);
@@ -187,11 +187,13 @@ class IndexPage extends React.Component{
           camera.translateY(-10);
           break;
         case "=":
+          event.preventDefault();
           if (event.ctrlKey){
             camera.translateZ(-10);
           }
           break;
         case "-":
+          event.preventDefault();
           if (event.ctrlKey){
             camera.translateZ(10);
           }
@@ -200,10 +202,13 @@ class IndexPage extends React.Component{
           this.setState({paused:!this.state.paused});
           break;
         case "r":
-          this.setState({time:+ new Date()});
-          this.time = + new Date(); 
-          this.move_planets();
-          break;
+          if (!event.ctrlKey){
+            this.setState({time:+ new Date()});
+            this.time = + new Date(); 
+            this.move_planets();
+            break;
+          }
+          
       }
     })
     loop();
