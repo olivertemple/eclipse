@@ -11,7 +11,11 @@ class IndexPage extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      time: + new Date()
+      time: + new Date(),
+      sun_scale:15000000,
+      planet_scale:500000,
+      distance_scale:1000000000,
+      speed:36000000
     }
     this.planets = [
       {name:"Sun", distance_from_sun:0, radius:696340e3, scene_item:null},
@@ -33,12 +37,11 @@ class IndexPage extends React.Component{
     let material;
     let loader = new TextureLoader().load(`static/${name.toLocaleLowerCase()}.jpg`);
 
-    if (name !== "Sun"){
-      geometry = new THREE.SphereGeometry( radius/500000, 32, 16 );
+    if (name !== "Sun"){//create planets
+      geometry = new THREE.SphereGeometry( radius/this.state.planet_scale, 32, 16 );
       material = new THREE.MeshPhysicalMaterial( { map: loader } );
-
-    }else{
-      geometry = new THREE.SphereGeometry( radius/15000000, 32, 16 );
+    }else{//creat the sun
+      geometry = new THREE.SphereGeometry( radius/this.state.sun_scale, 32, 16 );
       material = new THREE.MeshBasicMaterial( { map: loader } );
     }
 
@@ -48,7 +51,7 @@ class IndexPage extends React.Component{
       let angle = this.calculate_position(distance_from_sun);
       let x = Math.cos(angle) * distance_from_sun;
       let y = Math.sin(angle) * distance_from_sun;
-      sphere.position.set(x/1000000000, 0, y/1000000000);
+      sphere.position.set(x/this.state.distance_scale, 0, y/this.state.distance_scale);
     }
     
     return sphere;
@@ -76,10 +79,10 @@ class IndexPage extends React.Component{
           let angle = this.calculate_position(planet.distance_from_sun);
           let x = Math.cos(angle) * planet.distance_from_sun;
           let y = Math.sin(angle) * planet.distance_from_sun;
-          planet.scene_item.position.set(x/1000000000, 0, y/1000000000);
+          planet.scene_item.position.set(x/this.state.distance_scale, 0, y/this.state.distance_scale);
         }
       })
-      this.time = this.time + 36000000; //skip forward 10 hours
+      this.time = this.time + this.state.speed; //skip forward 10 hours
       this.setState({time:this.time});
       this.move_planets();
     }, 10)//wait 10 milliseconds
@@ -97,21 +100,46 @@ class IndexPage extends React.Component{
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
 
+    let index = 0;
     this.planets.forEach(planet => {
       let object = this.create_planet(planet.radius, planet.distance_from_sun, planet.name);
       planet.scene_item = object;
       scene.add(object);
-
-      if (planet.name === "Saturn"){
-          const geometry = new THREE.RingGeometry( 66900e3/500000, 74658e3/500000, 32 );
-          const loader = new TextureLoader().load(`static/saturn_rings.png`);
-          const material = new THREE.MeshBasicMaterial( { map: loader } );
-          const ring = new THREE.Mesh( geometry, material );
-          ring.rotateOnAxis(Math.PI/2);
-          let pos = this.calculate_position(1480800000e3);
-          ring.position.set(Math.cos(pos) * 1480800000e3/1000000000, 0, Math.sin(pos) * 1480800000e3/1000000000);
-          scene.add(ring);
-        }
+      let width;
+      switch(planet.name){
+        case "Mercury":
+          width = 1;
+          break;
+        case "Venus":
+          width = 1;
+          break;
+        case "Earth":
+          width = 1;
+          break;
+        case "Mars":
+          width = 2;
+          break;
+        case "Jupiter":
+          width = 3;
+          break;
+        case "Saturn":
+          width = 5;
+          break;
+        case "Uranus":
+          width = 6;
+          break;
+        case "Neptune":
+          width = 7;
+          break;
+        default:
+          width = 8;
+          break;
+      }
+      let orbit = new THREE.RingGeometry( planet.distance_from_sun/this.state.distance_scale, planet.distance_from_sun/this.state.distance_scale + width, 256 );
+      let material = new THREE.MeshBasicMaterial( { color: "#707070", side: THREE.DoubleSide } );
+      let ring = new THREE.Mesh( orbit, material );
+      ring.rotateX(Math.PI/2);
+      scene.add( ring );
     })
 
     const light = new THREE.PointLight( 0xffffff, 1, 100000000 );
@@ -132,7 +160,6 @@ class IndexPage extends React.Component{
         requestAnimationFrame(loop);
         // UPDATE CONTROLS
         controls.update(1 * secs);
-
         renderer.render(scene, camera);
     };
     loop();
