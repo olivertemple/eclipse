@@ -41,7 +41,6 @@ button{
 
 .popup{
     position:absolute;
-    height: 50vh;
     width: 50vw;
     background-color: white;
     z-index: 10;
@@ -52,6 +51,13 @@ button{
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 20px;
+}
+@media only screen and (max-width: 700px) {
+    .popup{
+        width: 90vw;
+        left: 5vw;
+    }
 }
 .popup_title{
     display: flex;

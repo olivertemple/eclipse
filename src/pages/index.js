@@ -304,6 +304,7 @@ class IndexPage extends React.Component{
             <div className="popup_content">
               <p>Eclipse is a 3D model of the solar system, using A level physics to calculate the rough position of the planets.</p>
               <p>Use the mouse, or the arrow keys and +/- symbols to move around and zoom in and out.</p>
+              <p>Please note: for an optimal experience, please use a device with a large screen.</p>
             </div>
             <button onClick={this.togglePopup}>Close</button>
           </div>
