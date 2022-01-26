@@ -10,6 +10,9 @@ import Helmet from "react-helmet";
 class IndexPage extends React.Component{
   constructor(props){
     super(props);
+    this.state = {
+      time: + new Date()
+    }
     this.planets = [
       {name:"Sun", distance_from_sun:0, radius:696340e3, scene_item:null},
       {name:"Mercury", distance_from_sun:57910000e3, radius:2439.7e3, scene_item:null},
@@ -57,8 +60,8 @@ class IndexPage extends React.Component{
     let T = (2*Math.PI*r*Math.sqrt(r))/(Math.sqrt(G*M)); //Time period for planet to orbit the sun
     let align = 16483651200; // Date of the alignment of the orbits
     let change = (align - this.time)/1000; // Time difference between now and the alignment of the orbits
-    let proportion_of_orbit = T / change - Math.floor(T / change); // Proportion of the orbit completed
-  
+    let proportion_of_orbit = (change / T - Math.floor(change / T)); // Proportion of the orbit completed
+    console.log(proportion_of_orbit);
     let circumference = 2*Math.PI*r; // Circumference of the orbit
     let proportion_of_circumference = proportion_of_orbit * circumference; // Proportion of the circumference completed
     let angle = proportion_of_circumference / r; // Angle of the proportion of the circumference completed
@@ -66,6 +69,7 @@ class IndexPage extends React.Component{
   }
 
   move_planets(){
+    console.log("----")
     setTimeout(() => {
       this.planets.forEach(planet => {
         if (planet.distance_from_sun > 0){
@@ -75,9 +79,10 @@ class IndexPage extends React.Component{
           planet.scene_item.position.set(x/1000000000, 0, y/1000000000);
         }
       })
-      this.time = this.time + 86400000
+      this.time = this.time + 36000000; //skip forward 10 hours
+      this.setState({time:this.time});
       this.move_planets();
-    }, 1)
+    }, 10)//wait 10 milliseconds
     
 
   }
@@ -133,6 +138,7 @@ class IndexPage extends React.Component{
     loop();
     this.move_planets();
   }
+
   render() { 
     return (
       <main>
@@ -142,6 +148,7 @@ class IndexPage extends React.Component{
           <link rel="icon" href="static/icon.png" />
         </Helmet>
         <main>
+          <h1 style={{color:"white", position:"absolute"}}>{new Date(this.state.time).toUTCString()}</h1>
           <div ref={this.scene_container}></div>
         </main>
       </main>
