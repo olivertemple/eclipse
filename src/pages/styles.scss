@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');
+
+body{
+    margin:0;
+    padding:0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+div.info{
+    padding:10px;
+    position:absolute;
+}
+
+.slider{
+    display: flex;
+    flex-direction: column;
+}
+
+label{
+    color:white;
+}
+#speed{
+    margin-top: 10px;
+    width: 250px;
+}
+
+button{
+    cursor: pointer;
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px 10px 20px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
