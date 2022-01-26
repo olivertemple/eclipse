@@ -15,6 +15,9 @@
     "clean": "gatsby clean"
   },
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.3.1",
     "@react-three/cannon": "^4.6.1",
     "@react-three/drei": "^8.6.3",
     "gatsby": "^4.5.4",

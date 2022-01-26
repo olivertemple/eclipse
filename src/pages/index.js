@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
 import Helmet from "react-helmet";
+import Switch from "@mui/material/Switch";
 import "./styles.scss";
 
 
@@ -16,7 +17,8 @@ class IndexPage extends React.Component{
       planet_scale:500000,//scale of the size of the planets
       distance_scale:1000000000,//scale of the distance of the planets
       paused:true,//whether the simulation is paused
-      speed:36000000
+      speed:36000000,
+      time_forward:true
     }
 
     this.planets = [
@@ -32,6 +34,11 @@ class IndexPage extends React.Component{
     ];
 
     this.scene_container = React.createRef();//create a reference to the scene container
+    this.camera = null;//the camera
+
+    this.reset = this.reset.bind(this);
+    this.togglePause = this.togglePause.bind(this);
+    this.switchTime = this.switchTime.bind(this);
   }
 
   calculate_position(r){//calculate the position of the planet
@@ -58,7 +65,11 @@ class IndexPage extends React.Component{
         }
       })
       if (!this.state.paused){
-        this.setState({time:this.state.time + this.state.speed});//skip forward
+        if (this.state.time_forward){
+          this.setState({time:this.state.time + this.state.speed});//skip forward
+        }else{
+          this.setState({time:this.state.time - this.state.speed});//skip backward
+        }
       }
 
       this.move_planets();//recursively call the function
@@ -128,6 +139,7 @@ class IndexPage extends React.Component{
     this.scene_container.current.innerHTML = ""; //clear the scene
     const scene = new THREE.Scene(); //create the scene
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 260000); //create the camera
+    this.camera = camera;
 
     const renderer = new THREE.WebGLRenderer(); //create the renderer
     renderer.setSize(window.innerWidth, window.innerHeight); //set the size of the renderer
@@ -242,6 +254,12 @@ class IndexPage extends React.Component{
   reset(){
     this.setState({time:+ new Date()});
     this.move_planets();
+    this.camera.position.set( 0, 500, 0 );
+    this.camera.lookAt(0,0,0);
+  }
+
+  switchTime(){
+    this.setState({time_forward:!this.state.time_forward});
   }
 
   render() { 
@@ -255,11 +273,15 @@ class IndexPage extends React.Component{
         <div className="info">
           <h1 style={{color:"white"}}>{this.convert_date(new Date(this.state.time))}</h1>
           <div className="slider">
-            <label htmlFor="speed">Speed: {(this.state.speed/(10*60*60)).toFixed(2)}x</label>
-            <input type="range" id="speed" min="0" max="36000000" defaultValue={this.state.speed} onChange={(e) => {this.setState({speed:parseFloat(e.target.value)})}}/>
+            <label htmlFor="speed">Speed: {(this.state.speed/10).toFixed(2)}x</label>
+            <input type="range" id="speed" min="10" max="36000000" defaultValue={this.state.speed} onChange={(e) => {this.setState({speed:parseFloat(e.target.value)})}}/>
           </div>
           <button onClick={this.togglePause}>{this.state.paused ? "Play" : "Pause"} </button>
           <button onClick={this.reset}>Reset</button>
+          <div className="switch">
+            <Switch className="time_forward" checked={this.state.time_forward} onChange={this.switchTime} inputProps={{ 'aria-label': 'controlled' }}/>
+            <label htmlFor="time_forward">Time Forward</label>
+          </div>
         </div>
         <div ref={this.scene_container}></div>
       </main>
