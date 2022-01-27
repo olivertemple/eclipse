@@ -56,7 +56,7 @@ class IndexPage extends React.Component{
   }
 
   move_planets(){//rotate the planets around the sun
-    setTimeout(() => {
+    setInterval(() => {
       this.planets.forEach(planet => {
         if (planet.distance_from_sun > 0){
           let angle = this.calculate_position(planet.distance_from_sun);//calculate the angle of the planet from the sun
@@ -72,8 +72,7 @@ class IndexPage extends React.Component{
           this.setState({time:this.state.time - this.state.speed});//skip backward
         }
       }
-
-      this.move_planets();//recursively call the function
+      
     }, 1)//wait 1 millisecond
   }
 
@@ -147,8 +146,6 @@ class IndexPage extends React.Component{
     renderer.setSize(window.innerWidth, window.innerHeight); //set the size of the renderer
     this.scene_container.current.appendChild(renderer.domElement); //append the renderer to the scene container
     renderer.shadowMap.enabled = true; //enable shadows
-
-
 
     //create the light in the center of the sun
     const light = new THREE.PointLight( 0xffffff, 1, 100000000 );
@@ -283,16 +280,18 @@ class IndexPage extends React.Component{
         </Helmet>
         <div className="info">
           <Clock time={this.state.time} />
-          <h1 style={{color:"white"}}>{this.convert_date(new Date(this.state.time))}</h1>
-          <div className="slider">
-            <label htmlFor="speed">Speed</label>
-            <input type="range" id="speed" min="10" max="36000000" defaultValue={this.state.speed} onChange={(e) => {this.setState({speed:parseFloat(e.target.value)})}}/>
-          </div>
-          <button onClick={this.togglePause}>{this.state.paused ? "Play" : "Pause"} </button>
-          <button onClick={this.reset}>Reset</button>
-          <div className="switch">
-            <Switch className="time_forward" checked={this.state.time_forward} onChange={this.switchTime} inputProps={{ 'aria-label': 'controlled' }}/>
-            <label htmlFor="time_forward">Time Forward</label>
+          <div className="controls">
+            <h1 style={{color:"white"}}>{this.convert_date(new Date(this.state.time))}</h1>
+            <div className="slider">
+              <label htmlFor="speed">Speed</label>
+              <input type="range" id="speed" min="10" max="36000000" defaultValue={this.state.speed} onChange={(e) => {this.setState({speed:parseFloat(e.target.value)})}}/>
+            </div>
+            <button onClick={this.togglePause}>{this.state.paused ? "Play" : "Pause"} </button>
+            <button onClick={this.reset}>Reset</button>
+            <div className="switch">
+              <Switch className="time_forward" checked={this.state.time_forward} onChange={this.switchTime} inputProps={{ 'aria-label': 'controlled' }}/>
+              <label htmlFor="time_forward">Time Forward</label>
+            </div>
           </div>
         </div>
         {this.state.popup ? (
