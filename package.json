@@ -8,7 +8,7 @@
     "gatsby"
   ],
   "scripts": {
-    "develop": "gatsby develop",
+    "develop": "gatsby develop -H 0.0.0.0",
     "start": "gatsby develop",
     "build": "gatsby build",
     "serve": "gatsby serve",
@@ -29,6 +29,7 @@
     "react-helmet": "^6.1.0",
     "react-three-fiber": "^6.0.13",
     "sass": "^1.49.0",
-    "three": "^0.136.0"
+    "three": "^0.136.0",
+    "three-text2d": "^0.6.0"
   }
 }

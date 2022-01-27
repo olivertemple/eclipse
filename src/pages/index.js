@@ -5,9 +5,8 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader.js';
 import Helmet from "react-helmet";
 import Switch from "@mui/material/Switch";
 import "./styles.scss";
-
-
-
+import Clock from "./components/Clock";
+import icon from "../../public/static/icon.png";
 class IndexPage extends React.Component{
   constructor(props){
     super(props);
@@ -18,7 +17,8 @@ class IndexPage extends React.Component{
       distance_scale:1000000000,//scale of the distance of the planets
       paused:true,//whether the simulation is paused
       speed:36000000,
-      time_forward:true
+      time_forward:true,
+      popup:true,
     }
 
     this.planets = [
@@ -39,6 +39,7 @@ class IndexPage extends React.Component{
     this.reset = this.reset.bind(this);
     this.togglePause = this.togglePause.bind(this);
     this.switchTime = this.switchTime.bind(this);
+    this.togglePopup = this.togglePopup.bind(this);
   }
 
   calculate_position(r){//calculate the position of the planet
@@ -55,7 +56,7 @@ class IndexPage extends React.Component{
   }
 
   move_planets(){//rotate the planets around the sun
-    setTimeout(() => {
+    setInterval(() => {
       this.planets.forEach(planet => {
         if (planet.distance_from_sun > 0){
           let angle = this.calculate_position(planet.distance_from_sun);//calculate the angle of the planet from the sun
@@ -71,9 +72,8 @@ class IndexPage extends React.Component{
           this.setState({time:this.state.time - this.state.speed});//skip backward
         }
       }
-
-      this.move_planets();//recursively call the function
-    }, 10)//wait 10 milliseconds
+      
+    }, 1)//wait 1 millisecond
   }
 
   componentDidMount(){
@@ -131,6 +131,7 @@ class IndexPage extends React.Component{
       }
     })
     loop();
+    //window.addEventListener('click', (e) => {this.onDocumentMouseDown(e, renderer, camera, scene)}, false);
 
     this.move_planets();//start the planets moving
   }
@@ -217,20 +218,23 @@ class IndexPage extends React.Component{
     }
 
     const sphere = new THREE.Mesh( geometry, material );
+    sphere.name = name;
+
     if (distance_from_sun > 0){//set the initial distance of the planets
       let angle = this.calculate_position(distance_from_sun);
       let x = Math.cos(angle) * distance_from_sun;
       let y = Math.sin(angle) * distance_from_sun;
       sphere.position.set(x/this.state.distance_scale, 0, y/this.state.distance_scale);
     }
+
     
     return sphere;
   }
 
   create_orbit_path(planet, width) {
     let orbit = new THREE.RingGeometry(
-      planet.distance_from_sun / this.state.distance_scale,
-      planet.distance_from_sun / this.state.distance_scale + width,
+      planet.distance_from_sun / this.state.distance_scale - width/2,
+      planet.distance_from_sun / this.state.distance_scale + width/2,
       256 //the number of segments to make up the circle
     ); //create the orbital path
 
@@ -243,7 +247,7 @@ class IndexPage extends React.Component{
   convert_date(date){
     let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    let today = `${date.toLocaleTimeString()}, ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    let today = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
     return today
   }
 
@@ -262,6 +266,10 @@ class IndexPage extends React.Component{
     this.setState({time_forward:!this.state.time_forward});
   }
 
+  togglePopup(){
+    this.setState({popup:!this.state.popup});
+  }
+
   render() { 
     return (
       <main>
@@ -271,18 +279,36 @@ class IndexPage extends React.Component{
           <link rel="icon" href="static/icon.png" />
         </Helmet>
         <div className="info">
-          <h1 style={{color:"white"}}>{this.convert_date(new Date(this.state.time))}</h1>
-          <div className="slider">
-            <label htmlFor="speed">Speed: {(this.state.speed/10).toFixed(2)}x</label>
-            <input type="range" id="speed" min="10" max="36000000" defaultValue={this.state.speed} onChange={(e) => {this.setState({speed:parseFloat(e.target.value)})}}/>
-          </div>
-          <button onClick={this.togglePause}>{this.state.paused ? "Play" : "Pause"} </button>
-          <button onClick={this.reset}>Reset</button>
-          <div className="switch">
-            <Switch className="time_forward" checked={this.state.time_forward} onChange={this.switchTime} inputProps={{ 'aria-label': 'controlled' }}/>
-            <label htmlFor="time_forward">Time Forward</label>
+          <Clock time={this.state.time} />
+          <div className="controls">
+            <h1 style={{color:"white"}}>{this.convert_date(new Date(this.state.time))}</h1>
+            <div className="slider">
+              <label htmlFor="speed">Speed</label>
+              <input type="range" id="speed" min="10" max="36000000" defaultValue={this.state.speed} onChange={(e) => {this.setState({speed:parseFloat(e.target.value)})}}/>
+            </div>
+            <button onClick={this.togglePause}>{this.state.paused ? "Play" : "Pause"} </button>
+            <button onClick={this.reset}>Reset</button>
+            <div className="switch">
+              <Switch className="time_forward" checked={this.state.time_forward} onChange={this.switchTime} inputProps={{ 'aria-label': 'controlled' }}/>
+              <label htmlFor="time_forward">Time Forward</label>
+            </div>
           </div>
         </div>
+        {this.state.popup ? (
+          <div className="popup">
+            <div className="popup_title">
+              <img id="icon" src={icon} />
+              <h1>Welcome to Eclipse!</h1>
+            </div>
+            <div className="popup_content">
+              <p>Eclipse is a 3D model of the solar system, using A level physics to calculate the rough position of the planets.</p>
+              <p>Use the mouse, or the arrow keys and +/- symbols to move around and zoom in and out.</p>
+              <p>Please note: for an optimal experience, please use a device with a large screen.</p>
+            </div>
+            <button onClick={this.togglePopup}>Close</button>
+          </div>
+        ) : null}
+        
         <div ref={this.scene_container}></div>
       </main>
     )

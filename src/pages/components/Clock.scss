@@ -1,0 +1,63 @@
+.Clock{
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    padding: 20px;
+    background-color: whitesmoke;
+    box-shadow: 0px 0px 20px 0px rgba(255,255,255,0.75);
+}
+.Clock_numbers{
+    height:200px;
+    width:200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position:absolute;
+    transform: rotate(-90deg);
+}
+
+.Clock_number{
+    position: absolute;
+    font-size: 20px;
+    font-weight: bold;
+    color: black;
+}
+
+.second_hand{
+    position:absolute;
+    width: 2.5px;
+    height: 90px;
+    background-color: red;
+    top: 40.5px;
+    left: 128.75px;
+    transform-origin: bottom;
+}
+.min_hand{
+    position:absolute;
+    width: 5px;
+    height: 80px;
+    background-color: black;
+    top: 50.5px;
+    left: 127.5px;
+    transform-origin: bottom;
+}
+
+.hour_hand{
+    position:absolute;
+    width: 5px;
+    height: 50px;
+    background-color: black;
+    top: 80.5px;
+    left: 127.5px;
+    transform-origin: bottom;
+}
+
+.center{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: grey;
+    top: 120px;
+    left: 120px;
+    border-radius: 50%;
+}
