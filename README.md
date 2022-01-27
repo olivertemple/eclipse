@@ -1,2 +1,2 @@
 # Eclipse
-A simple solar system simulation
+A simple solar system simulation 
